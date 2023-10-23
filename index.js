@@ -1,30 +1,27 @@
-const NAME = "super"
-const PASS = "secret"
+/**
+ * Users and their corresponding passwords.
+ * Add any number of users by extending this object.
+ */
+const USERS = {
+  "user1": "password1",
+  "user2": "password2",
+  "super": "secret"
+  // Add more users as needed.
+}
 
 /**
  * RegExp for basic auth credentials
- *
- * credentials = auth-scheme 1*SP token68
- * auth-scheme = "Basic" ; case insensitive
- * token68     = 1*( ALPHA / DIGIT / "-" / "." / "_" / "~" / "+" / "/" ) *"="
  */
-
 const CREDENTIALS_REGEXP = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/
 
 /**
  * RegExp for basic auth user/pass
- *
- * user-pass   = userid ":" password
- * userid      = *<TEXT excluding ":">
- * password    = *TEXT
  */
-
 const USER_PASS_REGEXP = /^([^:]*):(.*)$/
 
 /**
  * Object to represent user credentials.
  */
-
 const Credentials = function(name, pass) {
   this.name = name
   this.pass = pass
@@ -33,7 +30,6 @@ const Credentials = function(name, pass) {
 /**
  * Parse basic auth to object.
  */
-
 const parseAuthHeader = function(string) {
   if (typeof string !== 'string') {
     return undefined
@@ -57,7 +53,6 @@ const parseAuthHeader = function(string) {
   return new Credentials(userPass[1], userPass[2])
 }
 
-
 const unauthorizedResponse = function(body) {
   return new Response(
     body, {
@@ -72,10 +67,9 @@ const unauthorizedResponse = function(body) {
 /**
  * Handle request
  */
-
 async function handle(request) {
   const credentials = parseAuthHeader(request.headers.get("Authorization"))
-  if ( !credentials || credentials.name !== NAME ||  credentials.pass !== PASS) {
+  if (!credentials || !USERS[credentials.name] || USERS[credentials.name] !== credentials.pass) {
     return unauthorizedResponse("Unauthorized")
   } else {
     return fetch(request)
